@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export const CustomConnectButton = () => (
@@ -32,23 +33,23 @@ export const CustomConnectButton = () => (
           {(() => {
             if (!connected) {
               return (
-                <button onClick={openConnectModal} type="button">
+                <Button onClick={openConnectModal} type="button">
                   Connect Wallet
-                </button>
+                </Button>
               );
             }
 
             if (chain.unsupported) {
               return (
-                <button onClick={openChainModal} type="button">
+                <Button onClick={openChainModal} type="button">
                   Wrong network
-                </button>
+                </Button>
               );
             }
 
             return (
               <div style={{ display: "flex", gap: 12 }}>
-                <button
+                <Button
                   onClick={openChainModal}
                   style={{ display: "flex", alignItems: "center" }}
                   type="button"
@@ -56,10 +57,8 @@ export const CustomConnectButton = () => (
                   {chain.hasIcon && (
                     <div
                       style={{
-                        background: chain.iconBackground,
-                        width: 12,
-                        height: 12,
-                        borderRadius: 999,
+                        width: 24,
+                        height: 24,
                         overflow: "hidden",
                         marginRight: 4,
                       }}
@@ -74,12 +73,12 @@ export const CustomConnectButton = () => (
                     </div>
                   )}
                   {chain.name}
-                </button>
+                </Button>
 
-                <button onClick={openAccountModal} type="button">
+                <Button onClick={openAccountModal} type="button">
                   {account.displayName}
                   {account.displayBalance ? ` (${account.displayBalance})` : ""}
-                </button>
+                </Button>
               </div>
             );
           })()}

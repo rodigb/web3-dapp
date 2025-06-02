@@ -1,10 +1,13 @@
+import ClickRace from "./components/clickRace";
 import Navbar from "./components/navbar";
 
 function App() {
   return (
     <>
       <Navbar />
-      <div style={{ padding: "1rem" }}>Your App Content Here</div>
+      <div style={{ padding: "1rem" }}>
+        <ClickRace />
+      </div>
     </>
   );
 }
