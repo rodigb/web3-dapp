@@ -187,7 +187,7 @@ export default function PokerGame() {
   };
 
   return (
-    <Box sx={{ p: 2, color: "white", background: "#1e1e1e", borderRadius: 2 }}>
+    <Box sx={{ color: "white", background: "#1e1e1e", borderRadius: 2 }}>
       <Typography variant="h6">Simple Game</Typography>
       <Typography>Player 1: {players?.[0]}</Typography>
       <Typography>Player 2: {players?.[1]}</Typography>

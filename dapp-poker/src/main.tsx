@@ -6,10 +6,10 @@ import { darkTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@rainbow-me/rainbowkit/styles.css";
-import { hyperEVMTestnet } from "./chains/hyperevm";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./theme";
 import config from "./config";
+import { BrowserRouter } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -27,7 +27,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               overlayBlur: "small",
             })}
           >
-            <App />
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>

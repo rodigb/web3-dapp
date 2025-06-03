@@ -1,15 +1,19 @@
-import ClickRace from "./components/game/clickRace";
+import { Route, Routes } from "react-router-dom";
+import LandingPage from "./components/landingPage/landingPage";
 import Navbar from "./components/navbar/navbar";
 import { SnackbarProvider } from "notistack";
-
+import GamePage from "./components/game/clickRace";
+import { Box } from "@mui/material";
 function App() {
   return (
     <>
       <SnackbarProvider maxSnack={3} autoHideDuration={3000}>
         <Navbar />
-        <div style={{ padding: "1rem" }}>
-          <ClickRace />
-        </div>
+
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/game" element={<GamePage />} />
+        </Routes>
       </SnackbarProvider>
     </>
   );
