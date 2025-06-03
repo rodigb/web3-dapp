@@ -1,10 +1,10 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const PokerGame = await ethers.getContractFactory("PokerGame");
-  const game = await PokerGame.deploy();
+  const RockPaperScissorsGame = await ethers.getContractFactory("RockPaperScissorsGame");
+  const game = await RockPaperScissorsGame.deploy();
   await game.waitForDeployment();
-  console.log(`PokerGame deployed to: ${await game.getAddress()}`);
+  console.log(`RockPaperScissorsGame deployed to: ${await game.getAddress()}`);
 }
 
 main().catch((error) => {
