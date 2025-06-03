@@ -1,109 +1,120 @@
-import { useAccount } from "wagmi";
-import { Box, Button, Typography, Paper } from "@mui/material";
-import { useState, useEffect } from "react";
+import {
+  useAccount,
+  useChainId,
+  useReadContract,
+  useWriteContract,
+} from "wagmi";
+import { parseEther } from "viem";
+import { pokerGameAddress, pokerGameABI } from "../contracts/contract";
+import { Button, Typography, Box, TextField } from "@mui/material";
+import { useState } from "react";
 
-export default function ClickRace() {
+export default function PokerGame() {
   const { address, isConnected } = useAccount();
-  const [players, setPlayers] = useState<string[]>([]);
-  const [clicks, setClicks] = useState<Record<string, number>>({});
-  const [winner, setWinner] = useState<string | null>(null);
+  const chainId = useChainId();
+  const [move, setMove] = useState<number>(0);
 
-  console.log(players);
+  const { data: players } = useReadContract({
+    address: pokerGameAddress,
+    abi: pokerGameABI,
+    functionName: "getPlayers",
+    chainId,
+  });
 
-  useEffect(() => {
-    if (
-      isConnected &&
-      address &&
-      players.length < 2 &&
-      !players.some((a) => a.toLowerCase() === address.toLowerCase())
-    ) {
-      setPlayers((prev) => [...prev, address]);
-      setClicks((prev) => ({ ...prev, [address]: 0 }));
-    }
-  }, [isConnected, address, players]);
+  const { data: winner } = useReadContract({
+    address: pokerGameAddress,
+    abi: pokerGameABI,
+    functionName: "getWinner",
+    chainId,
+  });
 
-  const handleClick = () => {
-    if (!address || winner || players.length < 2) return;
+  const {
+    writeContract: writeJoin,
+    isPending: joining,
+    isSuccess: joined,
+    error: joinError,
+  } = useWriteContract();
+  const {
+    writeContract: writePlay,
+    isPending: playing,
+    isSuccess: played,
+    error: playError,
+  } = useWriteContract();
 
-    setClicks((prev) => {
-      const newCount = (prev[address] || 0) + 1;
-      const updated = { ...prev, [address]: newCount };
-
-      if (newCount >= 10) setWinner(address);
-
-      return updated;
+  const handleJoin = () => {
+    writeJoin({
+      address: pokerGameAddress,
+      abi: pokerGameABI,
+      functionName: "joinGame",
+      args: [],
+      chainId,
+      value: parseEther("0.01"),
     });
   };
 
-  const resetGame = () => {
-    setPlayers([]);
-    setClicks({});
-    setWinner(null);
+  const handlePlay = () => {
+    if (move < 1 || move > 10) {
+      alert("Enter a number between 1 and 10");
+      return;
+    }
+
+    writePlay({
+      address: pokerGameAddress,
+      abi: pokerGameABI,
+      functionName: "play",
+      args: [move],
+      chainId,
+    });
   };
 
-  if (!isConnected) {
-    return (
-      <Typography variant="body1" sx={{ mt: 4, textAlign: "center" }}>
-        Connect your wallet to join the game.
-      </Typography>
-    );
-  }
-
   return (
-    <Box display="flex" justifyContent="center" mt={4}>
-      <Paper
-        elevation={6}
-        sx={{
-          p: 4,
-          backgroundColor: "#1e1e1e",
-          color: "white",
-          width: "100%",
-          maxWidth: 500,
-        }}
+    <Box sx={{ p: 2, color: "white", background: "#1e1e1e", borderRadius: 2 }}>
+      <Typography variant="h6">Poker Game</Typography>
+      <Typography>Player 1: {players?.[0]}</Typography>
+      <Typography>Player 2: {players?.[1]}</Typography>
+
+      <Button
+        onClick={handleJoin}
+        disabled={joining}
+        sx={{ mt: 2 }}
+        variant="contained"
+        color="primary"
       >
-        <Typography variant="h5" gutterBottom>
-          Click Race Game
-        </Typography>
+        {joining ? "Joining..." : "Join Game (0.01 HYPE)"}
+      </Button>
 
-        <Typography variant="body2" gutterBottom>
-          Players connected: {players.length}/2
-        </Typography>
-
-        {players.length === 2 && players.includes(address) && (
-          <>
-            <Typography variant="body1" gutterBottom>
-              Your Clicks: {clicks[address] || 0}
-            </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={handleClick}
-              disabled={!!winner}
-              sx={{ my: 2 }}
-            >
-              Click Me!
-            </Button>
-          </>
-        )}
-
-        {winner && (
-          <Typography variant="h6" color="success.main" gutterBottom>
-            {winner === address
-              ? "🎉 You won!"
-              : `🏁 ${winner.slice(0, 6)}... won!`}
-          </Typography>
-        )}
-
+      <Box sx={{ mt: 3 }}>
+        <TextField
+          type="number"
+          value={move}
+          onChange={(e) => setMove(Number(e.target.value))}
+          inputProps={{ min: 1, max: 10 }}
+          sx={{ mr: 2, backgroundColor: "black", borderRadius: 1 }}
+        />
         <Button
-          variant="outlined"
+          onClick={handlePlay}
+          disabled={playing}
+          variant="contained"
           color="secondary"
-          fullWidth
-          onClick={resetGame}
         >
-          Reset Game
+          {playing ? "Submitting..." : "Play Move"}
         </Button>
-      </Paper>
+      </Box>
+
+      {played && <Typography mt={2}>✅ Move submitted!</Typography>}
+      {joined && <Typography mt={2}>✅ Joined game!</Typography>}
+      {winner && winner !== "0x0000000000000000000000000000000000000000" && (
+        <Typography mt={2} fontWeight="bold" color="#81c784">
+          🏆 Winner: {winner}
+        </Typography>
+      )}
+
+      {joinError && (
+        <Typography color="error">❌ {joinError.message}</Typography>
+      )}
+      {playError && (
+        <Typography color="error">❌ {playError.message}</Typography>
+      )}
     </Box>
   );
 }
