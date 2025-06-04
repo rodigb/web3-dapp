@@ -6,7 +6,7 @@ import {
 } from "wagmi";
 import { parseEther } from "viem";
 import { simpleGameAddress, simpleGameABI } from "../../contracts/contract.ts";
-import { Button, Typography, Box } from "@mui/material";
+import { Button, Typography, Box, Grid } from "@mui/material";
 import { useSnackbar } from "notistack";
 
 import config from "../../config.ts";
@@ -187,69 +187,123 @@ export default function PokerGame() {
   };
 
   return (
-    <Box sx={{ color: "white", background: "#1e1e1e", borderRadius: 2 }}>
-      <Typography variant="h6">Simple Game</Typography>
-      <Typography>Player 1: {players?.[0]}</Typography>
-      <Typography>Player 2: {players?.[1]}</Typography>
-
-      <Button
-        onClick={handleJoin}
-        disabled={joining}
-        sx={{ mt: 2 }}
-        variant="contained"
-        color="primary"
+    <Box
+      sx={{
+        bgcolor: "#d3d3d3",
+        minHeight: "100vh",
+        pt: 10,
+        width: "60vw",
+        mx: "auto",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "flex-start",
+      }}
+    >
+      <Box
+        sx={{
+          bgcolor: "#1e1e1e",
+          color: "white",
+          borderRadius: 2,
+          p: 3,
+          width: "100%",
+        }}
       >
-        {joining ? "Joining..." : "Join Game (0.01 HYPE)"}
-      </Button>
+        <Grid container spacing={4}>
+          {/* Left Side: Game Info */}
+          <Grid item xs={12} md={6}>
+            <Typography variant="h6" gutterBottom>
+              🎮 Simple Game
+            </Typography>
+            <Typography>👤 Player 1: {players?.[0] || "Waiting..."}</Typography>
+            <Typography>👤 Player 2: {players?.[1] || "Waiting..."}</Typography>
 
-      <Box mt={3}>
-        <Typography variant="subtitle1">Choose your move:</Typography>
-        <Button onClick={() => handleMoveSubmit(1)} disabled={moveSubmitting}>
-          ✊ Rock
-        </Button>
-        <Button
-          onClick={() => handleMoveSubmit(2)}
-          disabled={moveSubmitting}
-          sx={{ mx: 1 }}
-        >
-          📄 Paper
-        </Button>
-        <Button onClick={() => handleMoveSubmit(3)} disabled={moveSubmitting}>
-          ✂️ Scissors
-        </Button>
+            {winner &&
+              winner !== "0x0000000000000000000000000000000000000000" && (
+                <Typography mt={2}>
+                  🏆 Winner:{" "}
+                  {winner === address ? "You won!" : `Player: ${winner}`}
+                </Typography>
+              )}
+
+            {joined && (
+              <Typography mt={2} color="success.main">
+                ✅ Joined game!
+              </Typography>
+            )}
+
+            {joinError && (
+              <Typography mt={2} color="error">
+                ❌ {joinError.message}
+              </Typography>
+            )}
+          </Grid>
+
+          {/* Right Side: Actions */}
+          <Grid item xs={12} md={6}>
+            <Button
+              onClick={handleJoin}
+              disabled={joining}
+              sx={{ mb: 2 }}
+              fullWidth
+              variant="contained"
+              color="primary"
+            >
+              {joining ? "Joining..." : "Join Game (0.01 HYPE)"}
+            </Button>
+
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                🧠 Choose your move:
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1 }}>
+                <Button
+                  onClick={() => handleMoveSubmit(1)}
+                  disabled={moveSubmitting}
+                  variant="outlined"
+                >
+                  ✊ Rock
+                </Button>
+                <Button
+                  onClick={() => handleMoveSubmit(2)}
+                  disabled={moveSubmitting}
+                  variant="outlined"
+                >
+                  📄 Paper
+                </Button>
+                <Button
+                  onClick={() => handleMoveSubmit(3)}
+                  disabled={moveSubmitting}
+                  variant="outlined"
+                >
+                  ✂️ Scissors
+                </Button>
+              </Box>
+            </Box>
+
+            <Button
+              onClick={handleDetermineWinner}
+              disabled={determining}
+              fullWidth
+              sx={{ mb: 2 }}
+              variant="contained"
+            >
+              {determining ? "Determining..." : "Determine Winner"}
+            </Button>
+
+            {gameFinished && (
+              <Button
+                onClick={handleResetGame}
+                disabled={resetting}
+                fullWidth
+                variant="outlined"
+                color="secondary"
+              >
+                {resetting ? "Resetting..." : "Reset Game"}
+              </Button>
+            )}
+          </Grid>
+        </Grid>
       </Box>
-
-      <Button
-        onClick={handleDetermineWinner}
-        disabled={determining}
-        sx={{ mt: 2 }}
-        variant="outlined"
-      >
-        {determining ? "Determining..." : "Determine Winner"}
-      </Button>
-
-      {winner && winner !== "0x0000000000000000000000000000000000000000" && (
-        <Typography>
-          🏆 Winner: {winner === address ? "You won!" : `Player: ${winner}`}
-        </Typography>
-      )}
-      {gameFinished && (
-        <Button
-          onClick={handleResetGame}
-          disabled={resetting}
-          sx={{ mt: 2 }}
-          variant="outlined"
-          color="secondary"
-        >
-          {resetting ? "Resetting..." : "Reset Game"}
-        </Button>
-      )}
-
-      {joined && <Typography mt={2}>✅ Joined game!</Typography>}
-
-      {joinError && (
-        <Typography color="error">❌ {joinError.message}</Typography>
-      )}
     </Box>
   );
 }

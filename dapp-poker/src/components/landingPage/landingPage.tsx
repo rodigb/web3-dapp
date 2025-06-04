@@ -1,90 +1,96 @@
 import {
   Box,
-  Container,
   Grid,
   Typography,
+  Paper,
   Card,
-  CardContent,
   CardMedia,
+  CardContent,
 } from "@mui/material";
+import GameCard from "./gameCard";
+import rsps from "/rpspixel.jpeg";
 
-export default function GameHubLanding() {
+export default function GameDashboard() {
   return (
     <Box
       sx={{
-        bgcolor: "#e0e0e0",
+        bgcolor: "#d3d3d3",
+        minHeight: "100vh",
+        pt: 10,
         width: "60vw",
-        height: "100vh",
-        pt: 12,
-        pb: 6,
         mx: "auto",
+        display: "flex",
+        justifyContent: "center",
       }}
     >
-      <Container maxWidth="lg">
-        <Grid container spacing={4} justifyContent="center">
-          <Grid item xs={12} sm={6} md={4}>
-            <Card
+      <Box
+        sx={{
+          bgcolor: "#f0f0f0",
+          border: "1px solid #333",
+          width: "90%",
+          display: "flex",
+          gap: 2,
+          p: 2,
+        }}
+      >
+        <Box sx={{ flex: 2 }}>
+          <Paper elevation={3} sx={{ mb: 2 }}>
+            <Typography
+              variant="h6"
               sx={{
-                backgroundColor: "#ffffff",
-                borderRadius: 2,
-                border: "1px solid #ccc",
-                boxShadow: 2,
-                height: "100%",
-                width: "15vw",
-                transition: "transform 0.2s ease-in-out",
-                "&:hover": {
-                  transform: "scale(1.03)",
-                  boxShadow: 4,
-                },
-                cursor: "pointer",
+                bgcolor: "#1c2b22",
+                color: "white",
+                px: 2,
+                py: 1,
+                borderBottom: "1px solid #333",
               }}
-              onClick={() => (window.location.href = "/game")}
             >
-              <CardMedia
-                component="img"
-                height="160"
-                image="https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Rock-paper-scissors.svg/800px-Rock-paper-scissors.svg.png"
-                alt="Rock Paper Scissors"
+              Games
+            </Typography>
+          </Paper>
+          <Grid container spacing={"10px"} sx={{}}>
+            <Grid item style={{ width: "220px" }}>
+              <GameCard
+                title="Rock Paper Scissors"
+                image={rsps}
+                onClick={() => (window.location.href = "/game")}
               />
-              <CardContent>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight="bold"
-                  textAlign="center"
-                >
-                  Rock Paper Scissors
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {[...Array(5)].map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card
-                sx={{
-                  backgroundColor: "#f8f8f8",
-                  borderRadius: 2,
-                  border: "1px solid #ccc",
-                  boxShadow: 1,
-                  height: 240,
-                  width: "15vw",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "box-shadow 0.2s",
-                  "&:hover": {
-                    boxShadow: 3,
-                  },
-                }}
-              >
-                <Typography color="text.primary" fontSize={16}>
-                  Game To Be Added...
-                </Typography>
-              </Card>
             </Grid>
-          ))}
-        </Grid>
-      </Container>
+
+            {[...Array(1)].map((_, index) => (
+              <Grid item style={{ width: "220px" }} key={index}>
+                <Box sx={{ height: "100%" }}>
+                  <GameCard
+                    title="More Games Coming Soon"
+                    image=""
+                    onClick={() => (window.location.href = "/")}
+                  />
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        <Box sx={{ flex: 1 }}>
+          <Paper elevation={3}>
+            <Typography
+              variant="h6"
+              sx={{
+                bgcolor: "#1c2b22",
+                color: "white",
+                px: 2,
+                py: 1,
+                borderBottom: "1px solid #333",
+              }}
+            >
+              Top Rated Games
+            </Typography>
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography>Rating System Coming Soon...</Typography>
+            </Box>
+          </Paper>
+        </Box>
+      </Box>
     </Box>
   );
 }

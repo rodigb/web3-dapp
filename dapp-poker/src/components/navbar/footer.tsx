@@ -1,24 +1,28 @@
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import Toolbar from "@mui/material/Toolbar";
 import { CustomConnectButton } from "../wallet/connectButton";
 
-const Navbar = () => {
+const Footer = () => {
   return (
-    <AppBar
-      position="fixed"
+    <Box
+      component="footer"
       sx={{
-        bgcolor: "#1c2b22",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-        width: "60vw",
-        mx: "auto",
+        position: "fixed",
+        bottom: 0,
         left: 0,
         right: 0,
+        width: "60vw",
+        mx: "auto",
+        bgcolor: "#1c2b22",
+        boxShadow: "0 -2px 6px rgba(0,0,0,0.2)",
         zIndex: 1100,
       }}
     >
       <Toolbar
         sx={{
+          width: "60vw",
+          mx: "auto",
           display: "flex",
           justifyContent: "space-between",
         }}
@@ -27,14 +31,10 @@ const Navbar = () => {
           variant="h6"
           sx={{ fontWeight: "bold", color: "white", cursor: "pointer" }}
           onClick={() => (window.location.href = "/")}
-        >
-          🕹 GameHub
-        </Typography>
-
-        <CustomConnectButton />
+        ></Typography>
       </Toolbar>
-    </AppBar>
+    </Box>
   );
 };
 
-export default Navbar;
+export default Footer;

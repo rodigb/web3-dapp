@@ -3,7 +3,7 @@ import LandingPage from "./components/landingPage/landingPage";
 import Navbar from "./components/navbar/navbar";
 import { SnackbarProvider } from "notistack";
 import GamePage from "./components/game/clickRace";
-import { Box } from "@mui/material";
+import Footer from "./components/navbar/footer";
 function App() {
   return (
     <>
@@ -14,6 +14,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/game" element={<GamePage />} />
         </Routes>
+        <Footer />
       </SnackbarProvider>
     </>
   );
