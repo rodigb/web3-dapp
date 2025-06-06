@@ -8,24 +8,64 @@ import { parseEther } from "viem";
 import { simpleGameAddress, simpleGameABI } from "../../contracts/contract.ts";
 import { Button, Typography, Box, Grid } from "@mui/material";
 import { useSnackbar } from "notistack";
+import { ethers } from "ethers";
 
 import config from "../../config.ts";
 
 import { waitForTransactionReceipt } from "@wagmi/core";
 import type { hyperEVMTestnet } from "../../chains/hyperevm.tsx";
+import RpsUI from "./rpsUI";
+import { useEffect, useRef } from "react";
 
 export default function PokerGame() {
   const { enqueueSnackbar } = useSnackbar();
 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
+  const contractRef = useRef<ethers.Contract>();
+  const handledRef = useRef(false);
+
+  useEffect(() => {
+    if (!window.ethereum || !address) return;
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const contract = new ethers.Contract(
+      simpleGameAddress,
+      simpleGameABI,
+      provider
+    );
+    contractRef.current = contract;
+
+    const handleGameResult = (winnerAddress: string, result: string) => {
+      if (handledRef.current) return;
+      handledRef.current = true;
+
+      console.log("🏁 Game Result:", result);
+      console.log("🏆 Winner:", winnerAddress);
+
+      if (winnerAddress === "0x0000000000000000000000000000000000000000") {
+        enqueueSnackbar("It's a draw!", { variant: "info" });
+      } else if (winnerAddress.toLowerCase() === address.toLowerCase()) {
+        enqueueSnackbar("🎉 You won!", { variant: "success" });
+      } else {
+        enqueueSnackbar("😞 You lost.", { variant: "warning" });
+      }
+    };
+
+    contract.on("GameResult", handleGameResult);
+
+    return () => {
+      contract.removeAllListeners("GameResult");
+      handledRef.current = false;
+    };
+  }, [address, enqueueSnackbar]);
 
   const { data: players } = useReadContract({
     address: simpleGameAddress,
     abi: simpleGameABI,
     functionName: "getPlayers",
     chainId,
-  });
+  }) as { data: string[] | undefined };
 
   const { data: winner } = useReadContract({
     address: simpleGameAddress,
@@ -185,125 +225,17 @@ export default function PokerGame() {
       enqueueSnackbar(`❌ ${message}`, { variant: "error" });
     }
   };
-
   return (
-    <Box
-      sx={{
-        bgcolor: "#d3d3d3",
-        minHeight: "100vh",
-        pt: 10,
-        width: "60vw",
-        mx: "auto",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-      }}
-    >
-      <Box
-        sx={{
-          bgcolor: "#1e1e1e",
-          color: "white",
-          borderRadius: 2,
-          p: 3,
-          width: "100%",
-        }}
-      >
-        <Grid container spacing={4}>
-          {/* Left Side: Game Info */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              🎮 Simple Game
-            </Typography>
-            <Typography>👤 Player 1: {players?.[0] || "Waiting..."}</Typography>
-            <Typography>👤 Player 2: {players?.[1] || "Waiting..."}</Typography>
-
-            {winner &&
-              winner !== "0x0000000000000000000000000000000000000000" && (
-                <Typography mt={2}>
-                  🏆 Winner:{" "}
-                  {winner === address ? "You won!" : `Player: ${winner}`}
-                </Typography>
-              )}
-
-            {joined && (
-              <Typography mt={2} color="success.main">
-                ✅ Joined game!
-              </Typography>
-            )}
-
-            {joinError && (
-              <Typography mt={2} color="error">
-                ❌ {joinError.message}
-              </Typography>
-            )}
-          </Grid>
-
-          {/* Right Side: Actions */}
-          <Grid item xs={12} md={6}>
-            <Button
-              onClick={handleJoin}
-              disabled={joining}
-              sx={{ mb: 2 }}
-              fullWidth
-              variant="contained"
-              color="primary"
-            >
-              {joining ? "Joining..." : "Join Game (0.01 HYPE)"}
-            </Button>
-
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle1" gutterBottom>
-                🧠 Choose your move:
-              </Typography>
-              <Box sx={{ display: "flex", gap: 1 }}>
-                <Button
-                  onClick={() => handleMoveSubmit(1)}
-                  disabled={moveSubmitting}
-                  variant="outlined"
-                >
-                  ✊ Rock
-                </Button>
-                <Button
-                  onClick={() => handleMoveSubmit(2)}
-                  disabled={moveSubmitting}
-                  variant="outlined"
-                >
-                  📄 Paper
-                </Button>
-                <Button
-                  onClick={() => handleMoveSubmit(3)}
-                  disabled={moveSubmitting}
-                  variant="outlined"
-                >
-                  ✂️ Scissors
-                </Button>
-              </Box>
-            </Box>
-
-            <Button
-              onClick={handleDetermineWinner}
-              disabled={determining}
-              fullWidth
-              sx={{ mb: 2 }}
-              variant="contained"
-            >
-              {determining ? "Determining..." : "Determine Winner"}
-            </Button>
-
-            {gameFinished && (
-              <Button
-                onClick={handleResetGame}
-                disabled={resetting}
-                fullWidth
-                variant="outlined"
-                color="secondary"
-              >
-                {resetting ? "Resetting..." : "Reset Game"}
-              </Button>
-            )}
-          </Grid>
-        </Grid>
-      </Box>
-    </Box>
+    <RpsUI
+      onJoin={handleJoin}
+      onMoveSubmit={handleMoveSubmit}
+      joining={joining}
+      moveSubmitting={moveSubmitting}
+      players={players}
+      winner={winner}
+      address={address}
+      gameFinished={gameFinished}
+      resetGame={handleResetGame}
+    />
   );
 }

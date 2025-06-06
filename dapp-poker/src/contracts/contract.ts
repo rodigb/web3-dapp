@@ -1,4 +1,4 @@
-export const simpleGameAddress = "0xeF51694F93125f858Ec4eb947A95bADa4E6cfa51";
+export const simpleGameAddress = "0x922987c8dDE178A0B5a9f169F9Ed2BA916f2D298";
 
 export const simpleGameABI = [
   {

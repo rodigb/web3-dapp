@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import LandingPage from "./components/landingPage/landingPage";
 import Navbar from "./components/navbar/navbar";
 import { SnackbarProvider } from "notistack";
-import GamePage from "./components/game/clickRace";
+import GamePage from "./components/game/rps";
 import Footer from "./components/navbar/footer";
 function App() {
   return (

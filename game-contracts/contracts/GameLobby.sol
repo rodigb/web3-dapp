@@ -6,9 +6,10 @@ contract GameLobby {
     address public player2;
     uint256 public betAmount = 0.01 ether;
     bool public gameStarted;
+    uint256 public gameStartTime;
 
     event PlayerJoined(address player);
-    event GameReady(address player1, address player2);
+    event GameReady(address player1, address player2, uint256 startTime);
 
     function joinGame() external payable {
         require(!gameStarted, "Game already started");
@@ -21,8 +22,9 @@ contract GameLobby {
             require(msg.sender != player1, "Player already joined");
             player2 = msg.sender;
             gameStarted = true;
+            gameStartTime = block.timestamp;
             emit PlayerJoined(player2);
-            emit GameReady(player1, player2);
+            emit GameReady(player1, player2, gameStartTime);
         } else {
             revert("Game is full");
         }
